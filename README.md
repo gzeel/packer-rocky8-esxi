@@ -13,7 +13,7 @@ This Packer configuration file allows you to build images for VMware ESXi.
   - [VMware ESXi](https://www.vmware.com/nl/products/esxi-and-esx.html)
   - With SSH enabled.
 - Plugins
-  - [Vagrant-vmware-esxi plugin]?(https://github.com/josenk/vagrant-vmware-esxi)
+  - [Vagrant-vmware-esxi plugin](https://github.com/josenk/vagrant-vmware-esxi)
 
 ## How to use Packer
 
