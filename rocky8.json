@@ -1,0 +1,89 @@
+{
+  "variables": {
+      "boot_wait": "5s",
+      "disk_size": "40960",
+      "iso_checksum": "5a0dc65d1308e47b51a49e23f1030b5ee0f0ece3702483a8a6554382e893333c",
+      "iso_url": "https://nlrtm1-edge1.cdn.i3d.net/o1/k9999/pub/rockylinux/8.5/isos/x86_64/Rocky-8.5-x86_64-boot.iso",
+      "ssh_password" : "packer",
+      "ssh_username" : "packer",
+      "vm_name": "packer-Rocky-8.5-x86_64"
+    },
+    "builders": [
+      {
+        "type": "vmware-iso",
+        "format": "vmx",
+        "version": 19,
+        "boot_command": [
+          "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+        ],
+        "boot_wait": "{{ user `boot_wait` }}",
+        "disk_size": "{{ user `disk_size` }}",
+        "disk_type_id": "thin",
+        "cpus": "1",
+        "memory": "2048",
+        "guest_os_type": "centos8-64",
+        "headless": false,
+        "vnc_over_websocket": true,
+        "http_directory": "http",
+        "iso_checksum": "{{ user `iso_checksum` }}",
+        "iso_url": "{{ user `iso_url` }}",
+        "shutdown_command": "echo 'packer'|sudo -S /sbin/halt -h -p",
+        "ssh_password": "{{ user `ssh_password` }}",
+        "ssh_port": 22,
+        "ssh_username": "{{ user `ssh_username` }}",
+        "ssh_timeout": "30m",
+        "vm_name": "{{ user `vm_name` }}",
+        "insecure_connection": true,
+        "remote_type": "esx5",
+        "remote_host": "192.168.2.6",
+        "remote_datastore": "datastore1",
+        "remote_username": "root",
+        "remote_password": "{{user `esxi_password`}}",
+        "tools_upload_flavor": "linux",
+        "vmx_data": {
+           "cpuid.coresPerSocket": "1",
+           "ethernet0.networkName": "VM Network" 
+        },
+        "vmx_remove_ethernet_interfaces": true
+      }
+    ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "inline": [
+        "dnf -y update",
+        "dnf -y install python3",
+        "alternatives --set python /usr/bin/python3",
+        "python3 -m pip install -U pip",
+        "python3 -m pip install ansible"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "scripts/setup.yml",
+      "galaxy_file": "scripts/requirements.yml"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "scripts": [
+        "scripts/cleanup.sh"
+      ]
+    }
+  ],
+
+  "post-processors": [
+    [
+      {
+        "output": "builds/{{.Provider}}-rocky8.box",
+        "type": "vagrant"
+      },
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "gzeel/rocky8",
+        "version": "{{user `version`}}"
+      }
+    ]
+  ]
+}
