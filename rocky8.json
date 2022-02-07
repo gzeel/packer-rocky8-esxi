@@ -81,7 +81,7 @@
       },
       {
         "type": "vagrant-cloud",
-        "box_tag": "gzeel/rocky8",
+        "box_tag": "{{user `boxname`}}",
         "version": "{{user `version`}}"
       }
     ]

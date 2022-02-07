@@ -9,11 +9,14 @@ This Packer configuration file allows you to build images for VMware ESXi.
 
 - [Packer](https://www.packer.io/downloads.html)
   - <https://www.packer.io/intro/getting-started/install.html>
-- A Hypervisor
+- ESXi
   - [VMware ESXi](https://www.vmware.com/nl/products/esxi-and-esx.html)
   - With SSH enabled.
 - Plugins
   - [Vagrant-vmware-esxi plugin](https://github.com/josenk/vagrant-vmware-esxi)
+- Vagrant
+  - [Vagrant Cloud account](https://app.vagrantup.com/)
+  - VAGRANT_CLOUD_TOKEN environment variable with your [Vagrant Cloud](https://app.vagrantup.com/) authentication token.
 
 ## How to use Packer
 
@@ -22,7 +25,8 @@ Commands to create an automated VM image:
 To create a Rocky Linux 8 VM image using VMware Workstation use the following commands:
 
 ```cmd
-packer build -var 'version=<version>' -var 'esxi_password=<password>' rocky8.json
+export VAGRANT_CLOUD_TOKEN="<insert token here>"
+packer build -var 'version=<version>' -var 'boxname=<boxname>' -var 'esxi_password=<password>' rocky8.json
 ```
 
 By default the .iso of Rocky Linux 8 is pulled from <https://nlrtm1-edge1.cdn.i3d.net/o1/k9999/pub/rockylinux/8.5/isos/x86_64/Rocky-8.5-x86_64-boot.iso>
